@@ -1,0 +1,117 @@
+@host = https://localhost:7015
+# If your app runs on a different port, change the line above.
+# Variables populated automatically via requests:
+@authToken = {{login.response.body.token}}
+@dogId = {{registerDog.response.body.id}}
+
+### 
+# 1. LOGIN (Identity Module)
+# We send a "valid_" token to trigger the Mock service user return.
+# Response automatically populates the @authToken variable used below.
+# @name login
+POST {{host}}/api/identity/login
+Content-Type: application/json
+
+{
+  "idToken": "valid_token_123"
+}
+
+###
+# 2. REGISTER LOLA (Health Module)
+# Using token from the previous step.
+# Response populates the @dogId variable.
+# @name registerDog
+POST {{host}}/api/health/dogs
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Lola",
+  "breed": "Golden Retriever",
+  "dateOfBirth": "2021-06-16T00:00:00Z",
+  "ownerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+
+###
+# 3. RECORD VACCINATION (Health Module)
+# Using Lola's @dogId.
+POST {{host}}/api/health/vaccinations
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "dogId": "{{dogId}}",
+  "vaccineName": "Rabies",
+  "dateAdministered": "2024-05-01T10:00:00Z",
+  "validityInMonths": 12,
+  "vetClinicName": "Veterinary Station Rijeka"
+}
+
+###
+# 4. LOG WEIGHT (Health Module)
+# Initial entry (Baseline)
+POST {{host}}/api/health/weight
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "dogId": "{{dogId}}",
+  "weight": 28.5,
+  "measuredAt": "2024-05-01T08:00:00Z"
+}
+
+###
+# 5. LOG WEIGHT - ALARM TEST (Health Module)
+# Sudden weight jump to test Domain Event (check app console for logs).
+POST {{host}}/api/health/weight
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "dogId": "{{dogId}}",
+  "weight": 35.0,
+  "measuredAt": "2024-05-15T08:00:00Z"
+}
+
+###
+# 6. ADD LOCATION - LAKE BAJER (Activity Module)
+# These are real coordinates for Fužine.
+# Type: 1 (Lake), WaveIntensity: 0 (None), Cleanliness: 3 (Good)
+POST {{host}}/api/activity/locations
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Lake Bajer",
+  "description": "Lola's favorite spot. No waves, clean water.",
+  "latitude": 45.295,
+  "longitude": 14.715,
+  "type": 1,
+  "waveIntensity": 0,
+  "cleanliness": 3
+}
+
+###
+# 7. ADD LOCATION - JARUN (Activity Module)
+# Too far from Rijeka (testing filter).
+POST {{host}}/api/activity/locations
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Jarun",
+  "description": "Zagreb Lake",
+  "latitude": 45.78,
+  "longitude": 15.92,
+  "type": 1,
+  "waveIntensity": 0,
+  "cleanliness": 2
+}
+
+###
+# 8. FIND SWIMMING SPOTS NEAR RIJEKA (Activity Module)
+# Rijeka Coordinates (45.32, 14.44).
+# Radius 40km should catch Bajer, but not Jarun.
+GET {{host}}/api/activity/locations/nearby?latitude=45.327&longitude=14.442&radiusKm=40
+Authorization: Bearer {{authToken}}
+Accept: application/json
