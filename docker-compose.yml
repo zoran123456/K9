@@ -1,16 +1,16 @@
 ﻿services:
   database:
-    image: postgis/postgis:16-3.4  # Koristimo PostGIS image, ne obični Postgres!
+    image: postgis/postgis:16-3.4  # Using PostGIS image instead of plain PostgreSQL.
     container_name: k9_db
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: lola_password_123 # Jaka lozinka za dev ;)
+      POSTGRES_PASSWORD: lola_password_123 # Strong password for development ;)
       POSTGRES_DB: k9_db
     ports:
       - "5432:5432"
     volumes:
-      - k9_data:/var/lib/postgresql/data # Perzistencija podataka da ne nestanu kad ugasiš container
+      - k9_data:/var/lib/postgresql/data # Data persistence so it doesn't disappear when the container stops
 
 volumes:
   k9_data:
