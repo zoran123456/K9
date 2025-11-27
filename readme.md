@@ -220,3 +220,5 @@ dotnet test
 Made with ❤️ in Rijeka by Zoran.
 
 Dedicated to my Golden Retriever Lola 🐾 (who hates waves but loves lakes).
+
+<img width="1532" height="1879" alt="Gemini_Generated_Image_eui5eneui5eneui5 (1)" src="https://github.com/user-attachments/assets/bbdbd3eb-8a4a-47e9-82fc-ba9b353e04b3" />
